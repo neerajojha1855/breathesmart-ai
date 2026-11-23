@@ -20,6 +20,7 @@ def test_user_profile_defaults():
     prof = UserProfile(
         session_id=uuid.uuid4(),
         preferred_language="en",
+        sensitive_group_consent=False,
         household_preferences={"has_purifier": True},
         commuting_preferences={"primary_mode": "metro"},
         indoor_environment_preferences={"cook_fuel": "induction"},
