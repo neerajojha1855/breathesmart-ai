@@ -3,6 +3,12 @@ import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Layout } from './components/layout/Layout';
 import { LocationProvider } from './contexts/LocationContext';
+import { AssistantPage } from './pages/AssistantPage';
+import { DashboardPage } from './pages/DashboardPage';
+import { IndoorAdvisorPage } from './pages/IndoorAdvisorPage';
+import { PlannerPage } from './pages/PlannerPage';
+import { ProfilePage } from './pages/ProfilePage';
+import { SustainabilityPage } from './pages/SustainabilityPage';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -21,60 +27,12 @@ export const App: React.FC = () => {
         <BrowserRouter>
           <Layout>
             <Routes>
-              <Route
-                path="/"
-                element={
-                  <div className="bg-white rounded-2xl p-8 border border-slate-200 shadow-sm text-center">
-                    <h2 className="text-xl font-bold text-slate-900 mb-2">Air Quality Dashboard</h2>
-                    <p className="text-slate-600 text-sm">Dashboard view ready for Phase 3.2 feature integration.</p>
-                  </div>
-                }
-              />
-              <Route
-                path="/planner"
-                element={
-                  <div className="bg-white rounded-2xl p-8 border border-slate-200 shadow-sm text-center">
-                    <h2 className="text-xl font-bold text-slate-900 mb-2">Personalized Daily Planner</h2>
-                    <p className="text-slate-600 text-sm">Daily action planner view ready for Phase 3.2.</p>
-                  </div>
-                }
-              />
-              <Route
-                path="/indoor"
-                element={
-                  <div className="bg-white rounded-2xl p-8 border border-slate-200 shadow-sm text-center">
-                    <h2 className="text-xl font-bold text-slate-900 mb-2">Indoor Air Quality Advisor</h2>
-                    <p className="text-slate-600 text-sm">Ventilation and purifier guidelines view ready for Phase 3.2.</p>
-                  </div>
-                }
-              />
-              <Route
-                path="/sustainability"
-                element={
-                  <div className="bg-white rounded-2xl p-8 border border-slate-200 shadow-sm text-center">
-                    <h2 className="text-xl font-bold text-slate-900 mb-2">Sustainable Lifestyle Planner</h2>
-                    <p className="text-slate-600 text-sm">Commute emission comparison view ready for Phase 3.2.</p>
-                  </div>
-                }
-              />
-              <Route
-                path="/assistant"
-                element={
-                  <div className="bg-white rounded-2xl p-8 border border-slate-200 shadow-sm text-center">
-                    <h2 className="text-xl font-bold text-slate-900 mb-2">Conversational AI Assistant</h2>
-                    <p className="text-slate-600 text-sm">Contextual air quality chat view ready for Phase 3.2.</p>
-                  </div>
-                }
-              />
-              <Route
-                path="/profile"
-                element={
-                  <div className="bg-white rounded-2xl p-8 border border-slate-200 shadow-sm text-center">
-                    <h2 className="text-xl font-bold text-slate-900 mb-2">Household Preferences</h2>
-                    <p className="text-slate-600 text-sm">User preferences view ready for Phase 3.2.</p>
-                  </div>
-                }
-              />
+              <Route path="/" element={<DashboardPage />} />
+              <Route path="/planner" element={<PlannerPage />} />
+              <Route path="/indoor" element={<IndoorAdvisorPage />} />
+              <Route path="/sustainability" element={<SustainabilityPage />} />
+              <Route path="/assistant" element={<AssistantPage />} />
+              <Route path="/profile" element={<ProfilePage />} />
             </Routes>
           </Layout>
         </BrowserRouter>
