@@ -56,7 +56,26 @@ class Settings(BaseSettings):
         if "sslmode" in query and "ssl" not in query:
             query["ssl"] = query.pop("sslmode")
 
-        return str(url.set(query=query))
+        # render_as_string with hide_password=False prevents masking password with '***'
+        return url.set(query=query).render_as_string(hide_password=False)
+
+    @computed_field  # type: ignore[prop-decorator]
+    @property
+    def ASYNC_DATABASE_URL_UNPOOLED(self) -> str:
+        raw_url = self.DATABASE_URL_UNPOOLED or self.DATABASE_URL or os.getenv("DATABASE_URL_UNPOOLED", "")
+        raw_url = raw_url.strip().strip("'").strip('"')
+        if raw_url.startswith("postgres://"):
+            raw_url = raw_url.replace("postgres://", "postgresql+asyncpg://", 1)
+        elif raw_url.startswith("postgresql://"):
+            raw_url = raw_url.replace("postgresql://", "postgresql+asyncpg://", 1)
+
+        url = make_url(raw_url)
+        query = dict(url.query)
+        query.pop("channel_binding", None)
+        if "sslmode" in query and "ssl" not in query:
+            query["ssl"] = query.pop("sslmode")
+
+        return url.set(query=query).render_as_string(hide_password=False)
 
     @computed_field  # type: ignore[prop-decorator]
     @property

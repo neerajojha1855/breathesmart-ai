@@ -5,6 +5,7 @@ from typing import Annotated
 import uuid
 from fastapi import Cookie, Depends, Header, HTTPException, Request, Response, status
 from sqlalchemy import select
+from sqlalchemy.orm import selectinload
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.core.config import settings
 from app.core.exceptions import CSRFError, InvalidSessionError
@@ -36,9 +37,13 @@ async def get_or_create_session(
 
     if raw_token:
         token_h = hash_token(raw_token)
-        stmt = select(UserSession).where(
-            UserSession.token_hash == token_h,
-            UserSession.expires_at > now,
+        stmt = (
+            select(UserSession)
+            .options(selectinload(UserSession.profile))
+            .where(
+                UserSession.token_hash == token_h,
+                UserSession.expires_at > now,
+            )
         )
         result = await db.execute(stmt)
         session_obj = result.scalar_one_or_none()
