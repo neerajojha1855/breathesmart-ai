@@ -3,6 +3,7 @@
 import time
 
 import httpx
+
 from app.core.exceptions import GeocodingProviderError
 from app.schemas.geocoding import LocationSearchResult
 

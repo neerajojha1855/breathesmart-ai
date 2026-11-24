@@ -1,5 +1,7 @@
 """Master v1 API Router combining all sub-routers."""
 
+from fastapi import APIRouter
+
 from app.api.v1.endpoints import (
     air_quality,
     assistant,
@@ -9,7 +11,6 @@ from app.api.v1.endpoints import (
     recommendations,
     sustainability,
 )
-from fastapi import APIRouter
 
 api_router = APIRouter()
 api_router.include_router(locations.router)

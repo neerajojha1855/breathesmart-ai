@@ -91,3 +91,19 @@ async def test_assistant_chat_endpoint():
         data = resp.json()
         assert "message" in data
         assert "suggested_followups" in data
+
+
+@pytest.mark.asyncio
+async def test_health_and_security_headers():
+    async with AsyncClient(
+        transport=ASGITransport(app=app), base_url="http://test"
+    ) as ac:
+        resp = await ac.get("/health")
+        assert resp.status_code == 200
+        assert resp.json()["status"] == "ok"
+        assert resp.headers["x-content-type-options"] == "nosniff"
+        assert resp.headers["x-frame-options"] == "DENY"
+        assert resp.headers["referrer-policy"] == "strict-origin-when-cross-origin"
+
+        ready = await ac.get("/health/ready")
+        assert ready.status_code in (200, 503)

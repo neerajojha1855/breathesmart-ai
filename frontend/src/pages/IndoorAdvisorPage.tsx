@@ -1,7 +1,7 @@
 import React from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { AlertTriangle, CheckCircle2, Flame, Home, Wind, Zap } from 'lucide-react';
-import { useLocation } from '../contexts/LocationContext';
+import { useLocation } from '../hooks/useLocation';
 import { api } from '../services/api';
 
 export const IndoorAdvisorPage: React.FC = () => {

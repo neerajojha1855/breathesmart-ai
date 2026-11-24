@@ -1,12 +1,12 @@
 """Pydantic schemas for normalized air quality and atmospheric data."""
 
 from datetime import datetime
-from enum import Enum
+from enum import StrEnum
 
 from pydantic import BaseModel, Field
 
 
-class AQICategory(str, Enum):
+class AQICategory(StrEnum):
     GOOD = "good"
     MODERATE = "moderate"
     UNHEALTHY_SENSITIVE = "unhealthy_for_sensitive_groups"
@@ -16,13 +16,13 @@ class AQICategory(str, Enum):
     UNKNOWN = "unknown"
 
 
-class AQIStandard(str, Enum):
+class AQIStandard(StrEnum):
     US_AQI = "US_AQI"
     EU_AQI = "EU_AQI"
     CPCB = "CPCB"
 
 
-class DataSourceType(str, Enum):
+class DataSourceType(StrEnum):
     MEASURED = "measured"
     MODELED = "modeled"
     FORECAST = "forecast"

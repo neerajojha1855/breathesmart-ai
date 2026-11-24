@@ -1,15 +1,16 @@
 import uuid
 from typing import Annotated
 
+from fastapi import APIRouter, Depends, HTTPException, Query, status
+from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
+
 from app.api.deps import get_db, get_or_create_session
 from app.models.location import SavedLocation
 from app.models.session import UserSession
 from app.providers.geocoding.open_meteo import OpenMeteoGeocodingProvider
 from app.schemas.geocoding import LocationSearchResult
 from app.schemas.location import LocationCreate, SavedLocationResponse
-from fastapi import APIRouter, Depends, HTTPException, Query, status
-from sqlalchemy import select
-from sqlalchemy.ext.asyncio import AsyncSession
 
 router = APIRouter(prefix="/locations", tags=["Locations"])
 geocoding_provider = OpenMeteoGeocodingProvider()

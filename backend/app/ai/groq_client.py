@@ -4,6 +4,8 @@ import json
 import logging
 from typing import Any
 
+from groq import AsyncGroq
+
 from app.ai.fallback_generator import DeterministicFallbackGenerator
 from app.ai.prompts import ACTION_PLAN_SYSTEM_PROMPT, CHAT_ASSISTANT_SYSTEM_PROMPT
 from app.ai.schemas import (
@@ -13,7 +15,6 @@ from app.ai.schemas import (
 )
 from app.core.config import settings
 from app.schemas.air_quality import NormalizedAirQuality
-from groq import AsyncGroq
 
 logger = logging.getLogger(__name__)
 

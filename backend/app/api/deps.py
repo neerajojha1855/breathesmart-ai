@@ -4,6 +4,11 @@ import uuid
 from datetime import UTC, datetime, timedelta
 from typing import Annotated
 
+from fastapi import Cookie, Depends, Header, Request, Response
+from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import selectinload
+
 from app.core.config import settings
 from app.core.exceptions import CSRFError
 from app.core.security import (
@@ -16,10 +21,6 @@ from app.core.security import (
 from app.db.session import get_db
 from app.models.profile import UserProfile
 from app.models.session import UserSession
-from fastapi import Cookie, Depends, Header, Request, Response
-from sqlalchemy import select
-from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.orm import selectinload
 
 
 async def get_or_create_session(

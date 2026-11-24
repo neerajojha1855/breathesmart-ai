@@ -1,7 +1,14 @@
+import logging
+
+import httpx
+from fastapi import APIRouter, Query
+
 from app.ai.groq_client import GroqAIService
 from app.ai.schemas import AIChatRequest, AIChatResponse
+from app.core.exceptions import BreatheSmartException
 from app.providers.air_quality.open_meteo import OpenMeteoAirQualityProvider
-from fastapi import APIRouter, Query
+
+logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/assistant", tags=["AI Assistant"])
 ai_service = GroqAIService()
@@ -19,7 +26,12 @@ async def chat_with_assistant(
     if latitude is not None and longitude is not None:
         try:
             aqi_data = await aq_provider.get_current_air_quality(latitude, longitude)
-        except Exception:
-            pass
+        except (BreatheSmartException, httpx.HTTPError, ValueError) as exc:
+            logger.warning(
+                "Unable to fetch live AQI context for assistant (%s, %s): %s",
+                latitude,
+                longitude,
+                exc,
+            )
 
     return await ai_service.chat_assistant(req, aqi_data=aqi_data)

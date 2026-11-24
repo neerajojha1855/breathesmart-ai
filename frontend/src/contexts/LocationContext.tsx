@@ -1,23 +1,14 @@
-import React, { createContext, useContext, useState } from 'react';
+import React, { useState } from 'react';
 import type { LocationState } from '../types';
+import { LocationContext } from './locationContextInstance';
 
 // Sensible default location (New Delhi - prominent urban smog study area)
 const DEFAULT_LOCATION: LocationState = {
   city: 'New Delhi',
   country: 'India',
   latitude: 28.6139,
-  longitude: 77.2090,
+  longitude: 77.209,
 };
-
-interface LocationContextType {
-  location: LocationState;
-  setLocation: (loc: LocationState) => void;
-  requestGPSLocation: () => Promise<void>;
-  isLocating: boolean;
-  gpsError: string | null;
-}
-
-const LocationContext = createContext<LocationContextType | undefined>(undefined);
 
 export const LocationProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [location, setLocationState] = useState<LocationState>(() => {
@@ -69,10 +60,4 @@ export const LocationProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       {children}
     </LocationContext.Provider>
   );
-};
-
-export const useLocation = () => {
-  const ctx = useContext(LocationContext);
-  if (!ctx) throw new Error('useLocation must be used within LocationProvider');
-  return ctx;
 };

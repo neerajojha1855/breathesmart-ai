@@ -1,5 +1,6 @@
-from app.services.sustainability_service import TransportMode
 from pydantic import BaseModel, Field
+
+from app.services.sustainability_service import TransportMode
 
 
 class CommuteShiftRequest(BaseModel):

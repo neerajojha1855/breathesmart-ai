@@ -4,10 +4,11 @@ import uuid
 from datetime import datetime
 from typing import TYPE_CHECKING
 
-from app.models.base import Base
 from sqlalchemy import Boolean, DateTime, Float, ForeignKey, String, func
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
+
+from app.models.base import Base
 
 if TYPE_CHECKING:
     from app.models.session import UserSession

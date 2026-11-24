@@ -1,12 +1,13 @@
 """Indoor Air Quality Service: Scientifically safe ventilation schedules, HEPA purification, and combustion hazard mitigation."""
 
-from enum import Enum
+from enum import StrEnum
 
-from app.schemas.air_quality import AirQualityForecast, NormalizedAirQuality
 from pydantic import BaseModel, Field
 
+from app.schemas.air_quality import AirQualityForecast, NormalizedAirQuality
 
-class VentilationSuitability(str, Enum):
+
+class VentilationSuitability(StrEnum):
     OPTIMAL = "optimal"  # Clean outdoor air, open freely
     CONTROLLED = "controlled"  # Limited window (20-30 min) during afternoon solar peak
     UNFAVORABLE = "unfavorable"  # Keep windows closed; run air purifier; ventilate only briefly if CO2 rises

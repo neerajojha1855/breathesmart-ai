@@ -1,6 +1,7 @@
+from fastapi import APIRouter, Query
+
 from app.providers.air_quality.open_meteo import OpenMeteoAirQualityProvider
 from app.schemas.air_quality import AirQualityForecast, NormalizedAirQuality
-from fastapi import APIRouter, Query
 
 router = APIRouter(prefix="/air-quality", tags=["Air Quality"])
 aq_provider = OpenMeteoAirQualityProvider()

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { AlertCircle, CheckCircle, Clock, ShieldAlert, Sparkles, ThumbsDown, ThumbsUp, Zap } from 'lucide-react';
-import { useLocation } from '../contexts/LocationContext';
+import { useLocation } from '../hooks/useLocation';
 import { api } from '../services/api';
 import type { ActionRecommendationItem } from '../types';
 

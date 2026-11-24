@@ -28,36 +28,39 @@ class Settings(BaseSettings):
     AI_REQUEST_TIMEOUT_SECONDS: int = 60
     AI_MAX_RETRIES: int = 2
 
-    @computed_field  # type: ignore[prop-decorator]
-    @property
-    def ASYNC_DATABASE_URL(self) -> str:
-        # Fallback to env var directly if not set
-        raw_url = self.DATABASE_URL or os.getenv("DATABASE_URL", "")
-        # Strip any accidental wrapping quotes or whitespace
-        raw_url = raw_url.strip().strip("'").strip('"')
-
-        if not raw_url:
-            raise ValueError(
-                "DATABASE_URL is not set. Please ensure DATABASE_URL is defined in backend/.env"
-            )
-
-        # Neon provides postgresql:// - convert to asyncpg dialect
+    @staticmethod
+    def _normalize_async_database_url(raw_url: str) -> str:
+        """Convert Postgres URI to asyncpg format and strip unsupported query params."""
         if raw_url.startswith("postgres://"):
             raw_url = raw_url.replace("postgres://", "postgresql+asyncpg://", 1)
         elif raw_url.startswith("postgresql://"):
             raw_url = raw_url.replace("postgresql://", "postgresql+asyncpg://", 1)
 
-        # Parse with SQLAlchemy's URL parser to strip unsupported asyncpg query params
         url = make_url(raw_url)
         query = dict(url.query)
         # asyncpg does not support channel_binding
         query.pop("channel_binding", None)
-        # asyncpg expects ssl=require or sslmode
+        # asyncpg expects ssl=require instead of sslmode
         if "sslmode" in query and "ssl" not in query:
             query["ssl"] = query.pop("sslmode")
 
         # render_as_string with hide_password=False prevents masking password with '***'
         return url.set(query=query).render_as_string(hide_password=False)
+
+    @computed_field  # type: ignore[prop-decorator]
+    @property
+    def ASYNC_DATABASE_URL(self) -> str:
+        raw_url = (
+            (self.DATABASE_URL or os.getenv("DATABASE_URL", ""))
+            .strip()
+            .strip("'")
+            .strip('"')
+        )
+        if not raw_url:
+            raise ValueError(
+                "DATABASE_URL is not set. Please ensure DATABASE_URL is defined in backend/.env"
+            )
+        return self._normalize_async_database_url(raw_url)
 
     @computed_field  # type: ignore[prop-decorator]
     @property
@@ -68,18 +71,7 @@ class Settings(BaseSettings):
             or os.getenv("DATABASE_URL_UNPOOLED", "")
         )
         raw_url = (raw_val or "").strip().strip("'").strip('"')
-        if raw_url.startswith("postgres://"):
-            raw_url = raw_url.replace("postgres://", "postgresql+asyncpg://", 1)
-        elif raw_url.startswith("postgresql://"):
-            raw_url = raw_url.replace("postgresql://", "postgresql+asyncpg://", 1)
-
-        url = make_url(raw_url)
-        query = dict(url.query)
-        query.pop("channel_binding", None)
-        if "sslmode" in query and "ssl" not in query:
-            query["ssl"] = query.pop("sslmode")
-
-        return url.set(query=query).render_as_string(hide_password=False)
+        return self._normalize_async_database_url(raw_url)
 
     @computed_field  # type: ignore[prop-decorator]
     @property

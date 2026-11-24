@@ -1,12 +1,13 @@
 import uuid
 from typing import Annotated
 
+from fastapi import APIRouter, Depends, status
+from sqlalchemy.ext.asyncio import AsyncSession
+
 from app.api.deps import get_db, get_or_create_session
 from app.models.feedback import UserFeedback
 from app.models.session import UserSession
 from app.schemas.feedback import FeedbackCreate, FeedbackResponse
-from fastapi import APIRouter, Depends, status
-from sqlalchemy.ext.asyncio import AsyncSession
 
 router = APIRouter(prefix="/feedback", tags=["Feedback"])
 

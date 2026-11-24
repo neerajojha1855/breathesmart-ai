@@ -1,11 +1,12 @@
 from typing import Annotated
 
+from fastapi import APIRouter, Depends, Query
+
 from app.ai.schemas import BreatheSmartActionPlanResponse
 from app.api.deps import get_or_create_session
 from app.models.session import UserSession
 from app.services.indoor_air_service import IndoorAirAdvisorReport
 from app.services.recommendation_service import RecommendationService
-from fastapi import APIRouter, Depends, Query
 
 router = APIRouter(prefix="/recommendations", tags=["Recommendations"])
 service = RecommendationService()

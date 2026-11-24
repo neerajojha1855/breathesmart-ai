@@ -1,12 +1,13 @@
 from typing import Annotated
 
+from fastapi import APIRouter, Depends
+from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
+
 from app.api.deps import get_db, get_or_create_session
 from app.models.profile import UserProfile
 from app.models.session import UserSession
 from app.schemas.profile import UserProfileResponse, UserProfileUpdate
-from fastapi import APIRouter, Depends
-from sqlalchemy import select
-from sqlalchemy.ext.asyncio import AsyncSession
 
 router = APIRouter(prefix="/profile", tags=["Profile"])
 

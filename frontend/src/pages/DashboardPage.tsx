@@ -3,7 +3,7 @@ import { useQuery } from '@tanstack/react-query';
 import { NavLink } from 'react-router-dom';
 import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
 import { Activity, AlertTriangle, ArrowRight, Clock, Database, Home, Leaf, Table, Wind } from 'lucide-react';
-import { useLocation } from '../contexts/LocationContext';
+import { useLocation } from '../hooks/useLocation';
 import { api } from '../services/api';
 import { getAQIStyle } from '../utils/aqiColors';
 

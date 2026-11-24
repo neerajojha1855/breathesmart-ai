@@ -7,6 +7,7 @@ from datetime import UTC, datetime
 from typing import Any
 
 import httpx
+
 from app.core.exceptions import AirQualityProviderError
 from app.providers.air_quality.base import BaseAirQualityProvider
 from app.schemas.air_quality import (

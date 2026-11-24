@@ -1,39 +1,39 @@
 """Pydantic schemas for structured Groq GenAI responses and conversational assistant."""
 
-from enum import Enum
+from enum import StrEnum
 from typing import Any
 
 from pydantic import BaseModel, Field
 
 
-class RecommendationCategory(str, Enum):
+class RecommendationCategory(StrEnum):
     OUTDOOR = "outdoor"
     INDOOR = "indoor"
     COMMUTE = "commute"
     SUSTAINABILITY = "sustainability"
 
 
-class RecommendationPriority(str, Enum):
+class RecommendationPriority(StrEnum):
     LOW = "low"
     MEDIUM = "medium"
     HIGH = "high"
     URGENT = "urgent"
 
 
-class ImpactType(str, Enum):
+class ImpactType(StrEnum):
     EXPOSURE = "exposure"
     EMISSIONS = "emissions"
     ENERGY = "energy"
     QUALITATIVE = "qualitative"
 
 
-class ConfidenceLevel(str, Enum):
+class ConfidenceLevel(StrEnum):
     LOW = "low"
     MEDIUM = "medium"
     HIGH = "high"
 
 
-class RiskLevel(str, Enum):
+class RiskLevel(StrEnum):
     GOOD = "good"
     MODERATE = "moderate"
     HIGH = "high"

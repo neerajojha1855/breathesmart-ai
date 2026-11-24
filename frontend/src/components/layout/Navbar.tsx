@@ -14,7 +14,7 @@ import {
   User,
   X,
 } from 'lucide-react';
-import { useLocation } from '../../contexts/LocationContext';
+import { useLocation } from '../../hooks/useLocation';
 import { api } from '../../services/api';
 import type { LocationSearchResult } from '../../types';
 

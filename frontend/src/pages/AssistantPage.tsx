@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useMutation } from '@tanstack/react-query';
 import { Bot, Loader2, Send, Sparkles, User } from 'lucide-react';
-import { useLocation } from '../contexts/LocationContext';
+import { useLocation } from '../hooks/useLocation';
 import { api } from '../services/api';
 
 interface Message {
@@ -69,7 +69,11 @@ export const AssistantPage: React.FC = () => {
 
       {/* Chat Transcript Container */}
       <div className="bg-white rounded-2xl border border-slate-200 shadow-xs h-[520px] flex flex-col overflow-hidden">
-        <div className="flex-1 p-4 overflow-y-auto space-y-4">
+        <div
+          className="flex-1 p-4 overflow-y-auto space-y-4"
+          aria-live="polite"
+          aria-label="Conversation history"
+        >
           {messages.map((m, i) => (
             <div key={i} className={`flex gap-3 ${m.role === 'user' ? 'justify-end' : 'justify-start'}`}>
               {m.role === 'assistant' && (
@@ -146,6 +150,7 @@ export const AssistantPage: React.FC = () => {
               value={input}
               onChange={(e) => setInput(e.target.value)}
               placeholder={`Ask anything about air quality in ${location.city}...`}
+              aria-label="Ask a question about air quality"
               className="flex-1 px-4 py-2 text-sm bg-white border border-slate-300 rounded-xl focus:outline-none focus:ring-1 focus:ring-emerald-500"
             />
             <button

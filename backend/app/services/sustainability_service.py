@@ -1,11 +1,11 @@
 """Sustainability Service: Scientifically grounded emission calculations and travel mode comparisons."""
 
-from enum import Enum
+from enum import StrEnum
 
 from pydantic import BaseModel
 
 
-class TransportMode(str, Enum):
+class TransportMode(StrEnum):
     PETROL_CAR = "petrol_car"
     DIESEL_CAR = "diesel_car"
     ELECTRIC_CAR = "electric_car"
