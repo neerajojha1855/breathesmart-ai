@@ -1,5 +1,5 @@
 import os
-from typing import Optional
+
 from pydantic import computed_field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 from sqlalchemy.engine import make_url
@@ -14,7 +14,7 @@ class Settings(BaseSettings):
 
     # Database
     DATABASE_URL: str = ""
-    DATABASE_URL_UNPOOLED: Optional[str] = None
+    DATABASE_URL_UNPOOLED: str | None = None
     NEON_BRANCH: str = "production"
 
     # Auth & Sessions
@@ -23,7 +23,7 @@ class Settings(BaseSettings):
     SESSION_COOKIE_NAME: str = "breathe_smart_session"
 
     # AI Provider
-    GROQ_API_KEY: Optional[str] = None
+    GROQ_API_KEY: str | None = None
     GROQ_MODEL_NAME: str = "openai/gpt-oss-120b"
     AI_REQUEST_TIMEOUT_SECONDS: int = 60
     AI_MAX_RETRIES: int = 2
@@ -62,8 +62,12 @@ class Settings(BaseSettings):
     @computed_field  # type: ignore[prop-decorator]
     @property
     def ASYNC_DATABASE_URL_UNPOOLED(self) -> str:
-        raw_url = self.DATABASE_URL_UNPOOLED or self.DATABASE_URL or os.getenv("DATABASE_URL_UNPOOLED", "")
-        raw_url = raw_url.strip().strip("'").strip('"')
+        raw_val = (
+            self.DATABASE_URL_UNPOOLED
+            or self.DATABASE_URL
+            or os.getenv("DATABASE_URL_UNPOOLED", "")
+        )
+        raw_url = (raw_val or "").strip().strip("'").strip('"')
         if raw_url.startswith("postgres://"):
             raw_url = raw_url.replace("postgres://", "postgresql+asyncpg://", 1)
         elif raw_url.startswith("postgresql://"):
@@ -80,14 +84,20 @@ class Settings(BaseSettings):
     @computed_field  # type: ignore[prop-decorator]
     @property
     def SYNC_DATABASE_URL_UNPOOLED(self) -> str:
-        raw_url = self.DATABASE_URL_UNPOOLED or self.DATABASE_URL or os.getenv("DATABASE_URL_UNPOOLED", "")
-        raw_url = raw_url.strip().strip("'").strip('"')
+        raw_val = (
+            self.DATABASE_URL_UNPOOLED
+            or self.DATABASE_URL
+            or os.getenv("DATABASE_URL_UNPOOLED", "")
+        )
+        raw_url = (raw_val or "").strip().strip("'").strip('"')
         if raw_url.startswith("postgresql+asyncpg://"):
             raw_url = raw_url.replace("postgresql+asyncpg://", "postgresql://", 1)
         return raw_url
 
     model_config = SettingsConfigDict(
-        env_file=os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), ".env"),
+        env_file=os.path.join(
+            os.path.dirname(os.path.dirname(os.path.dirname(__file__))), ".env"
+        ),
         env_file_encoding="utf-8",
         extra="ignore",
     )

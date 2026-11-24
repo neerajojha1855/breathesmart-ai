@@ -1,12 +1,13 @@
 from contextlib import asynccontextmanager
-from fastapi import FastAPI, Request, status
-from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse
+
 from app.api.v1.router import api_router
 from app.core.config import settings
 from app.core.exceptions import BreatheSmartException
 from app.core.logging import setup_logging
 from app.db.session import check_db_connection
+from fastapi import FastAPI, Request, status
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
 
 
 @asynccontextmanager
@@ -24,7 +25,11 @@ app = FastAPI(
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[settings.FRONTEND_ORIGIN, "http://localhost:5173", "http://127.0.0.1:5173"],
+    allow_origins=[
+        settings.FRONTEND_ORIGIN,
+        "http://localhost:5173",
+        "http://127.0.0.1:5173",
+    ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -43,7 +48,9 @@ async def domain_exception_handler(request: Request, exc: BreatheSmartException)
 
     return JSONResponse(
         status_code=status_code,
-        content={"error": {"code": exc.code, "message": exc.message, "details": exc.details}},
+        content={
+            "error": {"code": exc.code, "message": exc.message, "details": exc.details}
+        },
     )
 
 
@@ -64,4 +71,8 @@ async def readiness_check():
             status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
             content={"status": "degraded", "database": "disconnected"},
         )
-    return {"status": "ready", "database": "connected", "neon_branch": settings.NEON_BRANCH}
+    return {
+        "status": "ready",
+        "database": "connected",
+        "neon_branch": settings.NEON_BRANCH,
+    }

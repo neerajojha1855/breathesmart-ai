@@ -1,7 +1,7 @@
 """Open-Meteo Geocoding provider for location search and coordinate lookup."""
 
 import time
-from typing import Any
+
 import httpx
 from app.core.exceptions import GeocodingProviderError
 from app.schemas.geocoding import LocationSearchResult
@@ -19,7 +19,9 @@ class OpenMeteoGeocodingProvider:
         if not self._client.is_closed:
             await self._client.aclose()
 
-    async def search_locations(self, query: str, count: int = 5) -> list[LocationSearchResult]:
+    async def search_locations(
+        self, query: str, count: int = 5
+    ) -> list[LocationSearchResult]:
         q = query.strip().lower()
         if len(q) < 2:
             return []
@@ -31,10 +33,17 @@ class OpenMeteoGeocodingProvider:
         try:
             response = await self._client.get(
                 self.BASE_URL,
-                params={"name": query, "count": count, "language": "en", "format": "json"},
+                params={
+                    "name": query,
+                    "count": count,
+                    "language": "en",
+                    "format": "json",
+                },
             )
             if response.status_code != 200:
-                raise GeocodingProviderError(f"Geocoding service returned status {response.status_code}")
+                raise GeocodingProviderError(
+                    f"Geocoding service returned status {response.status_code}"
+                )
 
             data = response.json()
             results_raw = data.get("results", []) or []
@@ -55,4 +64,6 @@ class OpenMeteoGeocodingProvider:
             self._cache[q] = (now, results)
             return results
         except httpx.RequestError as exc:
-            raise GeocodingProviderError(f"Network error contacting geocoding service: {exc}") from exc
+            raise GeocodingProviderError(
+                f"Network error contacting geocoding service: {exc}"
+            ) from exc

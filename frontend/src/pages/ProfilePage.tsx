@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { Check, ShieldCheck } from 'lucide-react';
 import { api } from '../services/api';
+import type { UserProfile } from '../types';
 
 export const ProfilePage: React.FC = () => {
   const [preferredLanguage, setPreferredLanguage] = useState('en');
@@ -24,20 +25,20 @@ export const ProfilePage: React.FC = () => {
     if (profile) {
       setPreferredLanguage(profile.preferred_language || 'en');
       setSensitiveGroupConsent(profile.sensitive_group_consent || false);
-      const hp = profile.household_preferences || {};
-      setHousingType(hp.housing_type || 'apartment');
-      setFloorLevel(hp.floor_level || 'middle');
-      setHasPurifier(hp.has_purifier ?? true);
-      setHasChildren(hp.has_children || false);
-      setHasElderly(hp.has_elderly || false);
-      setHasRespiratorySensitivities(hp.has_respiratory_sensitivities || false);
-      const cp = profile.commuting_preferences || {};
-      setPrimaryCommute(cp.primary_mode || 'metro');
+      const hp = (profile.household_preferences || {}) as Record<string, unknown>;
+      setHousingType((hp.housing_type as string) || 'apartment');
+      setFloorLevel((hp.floor_level as string) || 'middle');
+      setHasPurifier((hp.has_purifier as boolean) ?? true);
+      setHasChildren((hp.has_children as boolean) || false);
+      setHasElderly((hp.has_elderly as boolean) || false);
+      setHasRespiratorySensitivities((hp.has_respiratory_sensitivities as boolean) || false);
+      const cp = (profile.commuting_preferences || {}) as Record<string, unknown>;
+      setPrimaryCommute((cp.primary_mode as string) || 'metro');
     }
   }, [profile]);
 
   const mutation = useMutation({
-    mutationFn: (data: any) => api.updateProfile(data),
+    mutationFn: (data: Partial<UserProfile>) => api.updateProfile(data),
     onSuccess: () => {
       setSavedSuccess(true);
       setTimeout(() => setSavedSuccess(false), 3000);

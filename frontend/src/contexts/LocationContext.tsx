@@ -1,11 +1,5 @@
 import React, { createContext, useContext, useState } from 'react';
-
-export interface LocationState {
-  city: string;
-  country: string;
-  latitude: number;
-  longitude: number;
-}
+import type { LocationState } from '../types';
 
 // Sensible default location (New Delhi - prominent urban smog study area)
 const DEFAULT_LOCATION: LocationState = {

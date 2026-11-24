@@ -4,15 +4,19 @@
 - Recommendations generation with session profile context
 - Feedback POST
 """
+
 import uuid
+
 import pytest
-from httpx import ASGITransport, AsyncClient
 from app.main import app
+from httpx import ASGITransport, AsyncClient
 
 
 @pytest.mark.asyncio
 async def test_session_lifecycle_and_profile_flow():
-    async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as ac:
+    async with AsyncClient(
+        transport=ASGITransport(app=app), base_url="http://test"
+    ) as ac:
         # 1. Fetch initial profile (auto-provisions session cookie)
         resp = await ac.get("/api/v1/profile")
         assert resp.status_code == 200
@@ -47,7 +51,9 @@ async def test_session_lifecycle_and_profile_flow():
 
 @pytest.mark.asyncio
 async def test_locations_crud_flow():
-    async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as ac:
+    async with AsyncClient(
+        transport=ASGITransport(app=app), base_url="http://test"
+    ) as ac:
         # Establish session
         resp_init = await ac.get("/api/v1/profile")
         session_cookie = resp_init.cookies["breathe_smart_session"]
@@ -101,7 +107,9 @@ async def test_feedback_submission():
     from app.db.session import AsyncSessionLocal
     from app.models.recommendation import RecommendationPlan
 
-    async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as ac:
+    async with AsyncClient(
+        transport=ASGITransport(app=app), base_url="http://test"
+    ) as ac:
         resp_init = await ac.get("/api/v1/profile")
         session_cookie = resp_init.cookies["breathe_smart_session"]
         session_id = uuid.UUID(resp_init.json()["session_id"])
@@ -113,7 +121,9 @@ async def test_feedback_submission():
                 id=rec_id,
                 session_id=session_id,
                 ai_model="deterministic_fallback",
-                recommendation_data={"summary": "Keep windows closed during peak morning inversion."},
+                recommendation_data={
+                    "summary": "Keep windows closed during peak morning inversion."
+                },
             )
             db_session.add(plan)
             await db_session.commit()
@@ -136,8 +146,12 @@ async def test_feedback_submission():
 
 @pytest.mark.asyncio
 async def test_recommendations_generate_endpoint():
-    async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as ac:
-        resp = await ac.post("/api/v1/recommendations/generate?latitude=28.6139&longitude=77.2090")
+    async with AsyncClient(
+        transport=ASGITransport(app=app), base_url="http://test"
+    ) as ac:
+        resp = await ac.post(
+            "/api/v1/recommendations/generate?latitude=28.6139&longitude=77.2090"
+        )
         assert resp.status_code == 200
         plan = resp.json()
         assert "risk_level" in plan

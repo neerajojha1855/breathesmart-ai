@@ -15,13 +15,13 @@ from app.services.sustainability_service import (
 )
 
 __all__ = [
+    "CommuteShiftImpact",
+    "IndoorAirAdvisorReport",
+    "IndoorAirService",
+    "PurifierRecommendation",
+    "RecommendationService",
     "SustainabilityService",
     "TransportMode",
-    "CommuteShiftImpact",
-    "IndoorAirService",
-    "VentilationSuitability",
     "VentilationRecommendation",
-    "PurifierRecommendation",
-    "IndoorAirAdvisorReport",
-    "RecommendationService",
+    "VentilationSuitability",
 ]

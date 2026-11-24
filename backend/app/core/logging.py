@@ -1,6 +1,7 @@
+import logging
 import re
 import sys
-import logging
+
 from app.core.config import settings
 
 SENSITIVE_PATTERNS = [
@@ -10,13 +11,15 @@ SENSITIVE_PATTERNS = [
     re.compile(r"npg_[a-zA-Z0-9]+", re.IGNORECASE),  # Neon passwords
 ]
 
+
 class SanitizeFormatter(logging.Formatter):
     def format(self, record: logging.LogRecord) -> str:
         msg = super().format(record)
         for pattern in SENSITIVE_PATTERNS:
             msg = pattern.sub("[REDACTED]", msg)
         return msg
-    
+
+
 def setup_logging() -> None:
     log_level = logging.DEBUG if settings.DEBUG else logging.INFO
     handler = logging.StreamHandler(sys.stdout)

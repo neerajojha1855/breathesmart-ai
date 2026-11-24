@@ -14,6 +14,7 @@ def test_session_token_entropy_and_format():
     assert t1 != t2
     assert len(t1) >= 40
 
+
 def test_token_hashing_and_verification():
     token = generate_session_token()
     h = hash_token(token)

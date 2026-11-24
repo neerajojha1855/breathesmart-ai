@@ -1,6 +1,7 @@
 """Unit tests verifying Groq AI integration, schema validation, and fallback resilience."""
 
-from datetime import datetime, timezone
+from datetime import UTC, datetime
+
 import pytest
 from app.ai.fallback_generator import DeterministicFallbackGenerator
 from app.ai.groq_client import GroqAIService
@@ -38,7 +39,7 @@ def mock_aqi_data() -> NormalizedAirQuality:
         source_metadata=SourceMetadata(
             provider="Open-Meteo",
             data_type=DataSourceType.MODELED,
-            observed_at=datetime.now(timezone.utc),
+            observed_at=datetime.now(UTC),
         ),
     )
 

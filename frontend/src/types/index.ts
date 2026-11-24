@@ -109,3 +109,54 @@ export interface CommuteShiftImpact {
   methodology: string;
   assumptions: string[];
 }
+
+export interface LocationState {
+  city: string;
+  country: string;
+  latitude: number;
+  longitude: number;
+  is_primary?: boolean;
+}
+
+export interface VentilationRecommendation {
+  suitability: 'optimal' | 'controlled' | 'unfavorable' | 'hazardous' | string;
+  can_open_windows: boolean;
+  recommended_window: string;
+  max_duration_minutes: number;
+  rationale: string;
+  co2_management_warning: string;
+  action_steps: string[];
+}
+
+export interface PurifierRecommendation {
+  has_purifier: boolean;
+  recommended_mode: string;
+  filter_health_guidance: string;
+  target_pm25_indoor: string;
+  estimated_air_changes_per_hour: number;
+}
+
+export interface IndoorAirAdvisorReport {
+  ventilation: VentilationRecommendation;
+  purification: PurifierRecommendation;
+  cooking_safety_checklist: string[];
+  combustion_hazards_to_avoid: string[];
+}
+
+export interface UserProfile {
+  id: string;
+  session_id: string;
+  preferred_language: string;
+  household_preferences: Record<string, unknown>;
+  commuting_preferences: Record<string, unknown>;
+  indoor_environment_preferences: Record<string, unknown>;
+  sensitive_group_consent: boolean;
+  created_at?: string;
+  updated_at?: string;
+}
+
+export interface AIChatResponse {
+  message: string;
+  suggested_followups: string[];
+  context_sources: string[];
+}

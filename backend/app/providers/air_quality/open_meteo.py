@@ -1,17 +1,18 @@
 """Open-Meteo Air Quality provider implementation with caching and resilient retries."""
 
 import asyncio
-from datetime import datetime, timezone
 import random
 import time
+from datetime import UTC, datetime
 from typing import Any
+
 import httpx
 from app.core.exceptions import AirQualityProviderError
 from app.providers.air_quality.base import BaseAirQualityProvider
 from app.schemas.air_quality import (
+    AirQualityForecast,
     AQICategory,
     AQIStandard,
-    AirQualityForecast,
     DataSourceType,
     HourlyForecastPoint,
     NormalizedAirQuality,
@@ -66,11 +67,16 @@ class OpenMeteoAirQualityProvider(BaseAirQualityProvider):
                 else:
                     raise AirQualityProviderError(
                         f"Open-Meteo responded with status {response.status_code}",
-                        {"status_code": response.status_code, "body": response.text[:200]},
+                        {
+                            "status_code": response.status_code,
+                            "body": response.text[:200],
+                        },
                     )
             except httpx.RequestError as exc:
                 if attempt == max_retries - 1:
-                    raise AirQualityProviderError(f"Network error contacting Open-Meteo: {exc}") from exc
+                    raise AirQualityProviderError(
+                        f"Network error contacting Open-Meteo: {exc}"
+                    ) from exc
                 await asyncio.sleep(backoff + random.uniform(0.1, 0.2))
                 backoff *= 2
         raise AirQualityProviderError("Max retries exceeded contacting Open-Meteo")
@@ -104,19 +110,29 @@ class OpenMeteoAirQualityProvider(BaseAirQualityProvider):
         aqi_cat = calculate_us_aqi_category(us_aqi)
 
         pollutants = Pollutants(
-            pm2_5=PollutantMeasurement(value=float(curr.get("pm2_5") or 0.0), unit="µg/m³"),
-            pm10=PollutantMeasurement(value=float(curr.get("pm10") or 0.0), unit="µg/m³"),
-            no2=PollutantMeasurement(value=float(curr.get("nitrogen_dioxide") or 0.0), unit="µg/m³"),
-            so2=PollutantMeasurement(value=float(curr.get("sulphur_dioxide") or 0.0), unit="µg/m³"),
-            o3=PollutantMeasurement(value=float(curr.get("ozone") or 0.0), unit="µg/m³"),
-            co=PollutantMeasurement(value=float(curr.get("carbon_monoxide") or 0.0), unit="µg/m³"),
+            pm2_5=PollutantMeasurement(
+                value=float(curr.get("pm2_5") or 0.0), unit="µg/m³"
+            ),
+            pm10=PollutantMeasurement(
+                value=float(curr.get("pm10") or 0.0), unit="µg/m³"
+            ),
+            no2=PollutantMeasurement(
+                value=float(curr.get("nitrogen_dioxide") or 0.0), unit="µg/m³"
+            ),
+            so2=PollutantMeasurement(
+                value=float(curr.get("sulphur_dioxide") or 0.0), unit="µg/m³"
+            ),
+            o3=PollutantMeasurement(
+                value=float(curr.get("ozone") or 0.0), unit="µg/m³"
+            ),
+            co=PollutantMeasurement(
+                value=float(curr.get("carbon_monoxide") or 0.0), unit="µg/m³"
+            ),
         )
 
         obs_time_str = curr.get("time")
         obs_time = (
-            datetime.fromisoformat(obs_time_str)
-            if obs_time_str
-            else datetime.now(timezone.utc)
+            datetime.fromisoformat(obs_time_str) if obs_time_str else datetime.now(UTC)
         )
 
         result = NormalizedAirQuality(
@@ -133,7 +149,9 @@ class OpenMeteoAirQualityProvider(BaseAirQualityProvider):
                 data_type=DataSourceType.MODELED,
                 source_resolution="11km atmospheric CAMS grid",
                 observed_at=obs_time,
-                freshness_seconds=max(0, int(now - obs_time.timestamp())) if obs_time.tzinfo else 0,
+                freshness_seconds=max(0, int(now - obs_time.timestamp()))
+                if obs_time.tzinfo
+                else 0,
             ),
         )
         self._cache[key] = (now, result)
@@ -187,7 +205,7 @@ class OpenMeteoAirQualityProvider(BaseAirQualityProvider):
                 provider="Open-Meteo",
                 data_type=DataSourceType.FORECAST,
                 source_resolution="11km atmospheric CAMS grid",
-                observed_at=datetime.now(timezone.utc),
+                observed_at=datetime.now(UTC),
             ),
         )
         self._cache[key] = (now, result)

@@ -1,6 +1,7 @@
 """Unit tests for sustainability emissions calculator, indoor air service, and recommendation orchestrator."""
 
-from datetime import datetime, timezone
+from datetime import UTC, datetime
+
 import pytest
 from app.schemas.air_quality import (
     AQICategory,
@@ -33,7 +34,7 @@ def clean_aqi_data() -> NormalizedAirQuality:
         source_metadata=SourceMetadata(
             provider="Open-Meteo",
             data_type=DataSourceType.MODELED,
-            observed_at=datetime.now(timezone.utc),
+            observed_at=datetime.now(UTC),
         ),
     )
 
@@ -55,7 +56,7 @@ def smog_aqi_data() -> NormalizedAirQuality:
         source_metadata=SourceMetadata(
             provider="Open-Meteo",
             data_type=DataSourceType.MODELED,
-            observed_at=datetime.now(timezone.utc),
+            observed_at=datetime.now(UTC),
         ),
     )
 
@@ -95,7 +96,9 @@ def test_indoor_air_ventilation_safety_clean_vs_smog(
 
 
 def test_indoor_advisor_report_generation(smog_aqi_data: NormalizedAirQuality):
-    report = IndoorAirService.generate_full_advisor_report(smog_aqi_data, has_purifier=True)
+    report = IndoorAirService.generate_full_advisor_report(
+        smog_aqi_data, has_purifier=True
+    )
     assert report.ventilation.can_open_windows is False
     assert "Turbo" in report.purification.recommended_mode
     assert len(report.cooking_safety_checklist) >= 3

@@ -16,16 +16,16 @@ from app.ai.schemas import (
 )
 
 __all__ = [
-    "GroqAIService",
-    "DeterministicFallbackGenerator",
-    "BreatheSmartActionPlanResponse",
-    "ActionRecommendationItem",
-    "RecommendationCategory",
-    "RecommendationPriority",
-    "ImpactType",
-    "ConfidenceLevel",
-    "RiskLevel",
+    "AIChatMessage",
     "AIChatRequest",
     "AIChatResponse",
-    "AIChatMessage",
+    "ActionRecommendationItem",
+    "BreatheSmartActionPlanResponse",
+    "ConfidenceLevel",
+    "DeterministicFallbackGenerator",
+    "GroqAIService",
+    "ImpactType",
+    "RecommendationCategory",
+    "RecommendationPriority",
+    "RiskLevel",
 ]

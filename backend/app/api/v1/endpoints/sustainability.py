@@ -1,6 +1,9 @@
-from fastapi import APIRouter
 from app.schemas.sustainability import CommuteShiftRequest
-from app.services.sustainability_service import CommuteShiftImpact, SustainabilityService
+from app.services.sustainability_service import (
+    CommuteShiftImpact,
+    SustainabilityService,
+)
+from fastapi import APIRouter
 
 router = APIRouter(prefix="/sustainability", tags=["Sustainability"])
 

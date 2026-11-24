@@ -1,13 +1,13 @@
 import uuid
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
+
 from app.models.feedback import UserFeedback
-from app.models.location import SavedLocation
 from app.models.profile import UserProfile
 from app.models.session import UserSession
 
 
 def test_user_session_instantiation():
-    now = datetime.now(timezone.utc)
+    now = datetime.now(UTC)
     sess = UserSession(
         token_hash="a" * 64,
         expires_at=now + timedelta(days=1),

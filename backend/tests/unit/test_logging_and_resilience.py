@@ -1,17 +1,19 @@
 """Unit tests verifying sensitive logging redaction, custom exceptions, and fallback triggers."""
+
 import logging
-from datetime import datetime, timezone
-from app.core.logging import SanitizeFormatter, setup_logging
+from datetime import UTC, datetime
+
+from app.ai.fallback_generator import DeterministicFallbackGenerator
 from app.core.exceptions import (
+    AIProviderError,
+    AirQualityProviderError,
     BreatheSmartException,
+    CSRFError,
+    GeocodingProviderError,
     InvalidSessionError,
     SessionExpiredError,
-    CSRFError,
-    AirQualityProviderError,
-    GeocodingProviderError,
-    AIProviderError,
 )
-from app.ai.fallback_generator import DeterministicFallbackGenerator
+from app.core.logging import SanitizeFormatter, setup_logging
 from app.schemas.air_quality import (
     AQICategory,
     AQIStandard,
@@ -83,18 +85,24 @@ def test_fallback_generator_various_aqi_levels():
             source_metadata=SourceMetadata(
                 provider="Open-Meteo",
                 data_type=DataSourceType.MODELED,
-                observed_at=datetime.now(timezone.utc),
+                observed_at=datetime.now(UTC),
             ),
         )
 
     # Moderate
-    mod_plan = DeterministicFallbackGenerator.generate_plan(make_aqi(75, AQICategory.MODERATE))
+    mod_plan = DeterministicFallbackGenerator.generate_plan(
+        make_aqi(75, AQICategory.MODERATE)
+    )
     assert mod_plan is not None
 
     # Unhealthy
-    unh_plan = DeterministicFallbackGenerator.generate_plan(make_aqi(160, AQICategory.UNHEALTHY))
+    unh_plan = DeterministicFallbackGenerator.generate_plan(
+        make_aqi(160, AQICategory.UNHEALTHY)
+    )
     assert unh_plan is not None
 
     # Hazardous
-    haz_plan = DeterministicFallbackGenerator.generate_plan(make_aqi(350, AQICategory.HAZARDOUS))
+    haz_plan = DeterministicFallbackGenerator.generate_plan(
+        make_aqi(350, AQICategory.HAZARDOUS)
+    )
     assert haz_plan is not None

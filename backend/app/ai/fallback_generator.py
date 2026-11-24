@@ -45,7 +45,9 @@ class DeterministicFallbackGenerator:
             ActionRecommendationItem(
                 title="Morning Routine & Exercise Adjustment",
                 category=RecommendationCategory.OUTDOOR,
-                priority=RecommendationPriority.URGENT if aqi > 150 else RecommendationPriority.MEDIUM,
+                priority=RecommendationPriority.URGENT
+                if aqi > 150
+                else RecommendationPriority.MEDIUM,
                 recommended_time="06:00 - 09:00 AM",
                 action=(
                     "Shift strenuous cardio indoors; avoid running near high-traffic corridors."
@@ -56,7 +58,9 @@ class DeterministicFallbackGenerator:
                 expected_impact="Reduces acute particulate lung deposition by 40-70%.",
                 impact_type=ImpactType.EXPOSURE,
                 confidence=ConfidenceLevel.HIGH,
-                assumptions=["Assumes ground-level temperature inversion during winter early mornings."],
+                assumptions=[
+                    "Assumes ground-level temperature inversion during winter early mornings."
+                ],
             ),
             ActionRecommendationItem(
                 title="Controlled Home Ventilation Window",
@@ -72,7 +76,9 @@ class DeterministicFallbackGenerator:
                 expected_impact="Purges indoor CO2 and moisture buildup while minimizing particulate ingress.",
                 impact_type=ImpactType.EXPOSURE,
                 confidence=ConfidenceLevel.HIGH,
-                assumptions=["Assumes afternoon boundary layer rise allows lower ground concentrations."],
+                assumptions=[
+                    "Assumes afternoon boundary layer rise allows lower ground concentrations."
+                ],
             ),
             ActionRecommendationItem(
                 title="Low-Emission Commute Mode Choice",
@@ -84,12 +90,16 @@ class DeterministicFallbackGenerator:
                 expected_impact="Eliminates ~2.4 kg CO2e per 15 km trip and reduces personal cabin pollution exposure.",
                 impact_type=ImpactType.EMISSIONS,
                 confidence=ConfidenceLevel.HIGH,
-                assumptions=["Calculated based on standard DEFRA passenger transit emission factors."],
+                assumptions=[
+                    "Calculated based on standard DEFRA passenger transit emission factors."
+                ],
             ),
             ActionRecommendationItem(
                 title="Nighttime Indoor Air Quality Protection",
                 category=RecommendationCategory.INDOOR,
-                priority=RecommendationPriority.HIGH if aqi > 150 else RecommendationPriority.LOW,
+                priority=RecommendationPriority.HIGH
+                if aqi > 150
+                else RecommendationPriority.LOW,
                 recommended_time="10:00 PM - 06:00 AM",
                 action="Run HEPA air purifier on quiet/sleep mode in bedrooms; ensure cooking exhaust is off and doors closed.",
                 reason="Continuous filtration maintains low PM2.5 levels throughout the 8-hour sleep cycle.",

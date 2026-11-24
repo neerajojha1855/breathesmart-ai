@@ -1,9 +1,8 @@
 """Sustainability Service: Scientifically grounded emission calculations and travel mode comparisons."""
 
-from dataclasses import dataclass
 from enum import Enum
-from typing import Any
-from pydantic import BaseModel, Field
+
+from pydantic import BaseModel
 
 
 class TransportMode(str, Enum):
@@ -87,9 +86,7 @@ class SustainabilityService:
                 "Recommendation: Choose low-traffic green corridors or shift to electric metro during high AQI alerts."
             )
         else:
-            exposure_benefit = (
-                "Bus transit reduces private vehicle density on the road corridor, though personal exposure depends on cabin filtration."
-            )
+            exposure_benefit = "Bus transit reduces private vehicle density on the road corridor, though personal exposure depends on cabin filtration."
 
         emissions_benefit = (
             f"Prevents {trip_saving_kg:.2f} kg CO2e per trip ({weekly_saved_kg:.1f} kg CO2e/week). "
