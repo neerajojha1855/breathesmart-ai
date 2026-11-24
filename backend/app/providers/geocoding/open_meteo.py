@@ -15,6 +15,10 @@ class OpenMeteoGeocodingProvider:
         self._client = client or httpx.AsyncClient(timeout=10.0)
         self._cache: dict[str, tuple[float, list[LocationSearchResult]]] = {}
 
+    async def aclose(self) -> None:
+        if not self._client.is_closed:
+            await self._client.aclose()
+
     async def search_locations(self, query: str, count: int = 5) -> list[LocationSearchResult]:
         q = query.strip().lower()
         if len(q) < 2:

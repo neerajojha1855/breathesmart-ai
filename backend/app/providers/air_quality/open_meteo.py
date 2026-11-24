@@ -43,6 +43,10 @@ class OpenMeteoAirQualityProvider(BaseAirQualityProvider):
         self._client = client or httpx.AsyncClient(timeout=10.0)
         self._cache: dict[str, tuple[float, Any]] = {}
 
+    async def aclose(self) -> None:
+        if not self._client.is_closed:
+            await self._client.aclose()
+
     def _cache_key(self, prefix: str, lat: float, lon: float) -> str:
         return f"{prefix}:{round(lat, 3)}:{round(lon, 3)}"
 
