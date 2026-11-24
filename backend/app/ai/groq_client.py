@@ -75,6 +75,35 @@ class GroqAIService:
                 # Handle wrapped "response" key if present
                 if "response" in parsed_json and isinstance(parsed_json["response"], dict):
                     parsed_json = parsed_json["response"]
+
+                # Normalize if model used grouped exposure/emissions keys
+                if "recommendations" not in parsed_json and any(k in parsed_json for k in ["personal_exposure", "direct_emissions"]):
+                    recs = []
+                    for item in parsed_json.get("personal_exposure", []):
+                        if isinstance(item, dict):
+                            item.setdefault("category", "outdoor")
+                            item.setdefault("impact_type", "exposure")
+                            item.setdefault("priority", "high")
+                            item.setdefault("confidence", "high")
+                            item.setdefault("recommended_time", "All Day")
+                            item.setdefault("reason", "Particulate exposure avoidance")
+                            item.setdefault("expected_impact", "Reduces inhalation of fine particulates")
+                            recs.append(item)
+                    for item in parsed_json.get("direct_emissions", []):
+                        if isinstance(item, dict):
+                            item.setdefault("category", "sustainability")
+                            item.setdefault("impact_type", "emissions")
+                            item.setdefault("priority", "medium")
+                            item.setdefault("confidence", "high")
+                            item.setdefault("recommended_time", "Daily")
+                            item.setdefault("reason", "Carbon footprint reduction")
+                            item.setdefault("expected_impact", "Measurable CO2e reduction")
+                            recs.append(item)
+                    parsed_json["recommendations"] = recs
+                    parsed_json.setdefault("summary", f"Daily air quality plan for AQI {aqi_data.aqi}")
+                    parsed_json.setdefault("explanation", f"Current air quality is {aqi_data.aqi_category.value} with dominant pollutant {aqi_data.dominant_pollutant}.")
+                    parsed_json.setdefault("risk_level", "severe" if aqi_data.aqi >= 200 else ("high" if aqi_data.aqi >= 150 else ("moderate" if aqi_data.aqi >= 50 else "good")))
+
                 return BreatheSmartActionPlanResponse.model_validate(parsed_json)
             except Exception as exc:
                 logger.warning(
