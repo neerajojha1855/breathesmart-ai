@@ -27,6 +27,105 @@ class GroqAIService:
         self.model = model or settings.GROQ_MODEL_NAME
         self.client = AsyncGroq(api_key=self.api_key) if self.api_key else None
 
+    @staticmethod
+    def _derive_risk_level(aqi: int) -> str:
+        """Map numeric US AQI value to discrete risk level string."""
+        if aqi >= 200:
+            return "severe"
+        if aqi >= 150:
+            return "high"
+        if aqi >= 50:
+            return "moderate"
+        return "good"
+
+    @staticmethod
+    def _build_action_plan_context(
+        aqi_data: NormalizedAirQuality,
+        user_preferences: dict[str, Any] | None = None,
+    ) -> str:
+        """Serialize verified AQI readings and user preferences for LLM grounding."""
+        p = aqi_data.pollutants
+        return json.dumps(
+            {
+                "environmental_context": {
+                    "aqi": aqi_data.aqi,
+                    "standard": aqi_data.aqi_standard.value,
+                    "category": aqi_data.aqi_category.value,
+                    "pollutants": {
+                        "pm2_5": p.pm2_5.value if p.pm2_5 else None,
+                        "pm10": p.pm10.value if p.pm10 else None,
+                        "no2": p.no2.value if p.no2 else None,
+                        "o3": p.o3.value if p.o3 else None,
+                    },
+                    "coordinates": {
+                        "lat": aqi_data.latitude,
+                        "lon": aqi_data.longitude,
+                    },
+                    "observed_at": str(aqi_data.source_metadata.observed_at),
+                },
+                "user_preferences": user_preferences or {},
+            }
+        )
+
+    @classmethod
+    def _normalize_action_plan_payload(
+        cls,
+        parsed_json: dict[str, Any],
+        aqi_data: NormalizedAirQuality,
+    ) -> dict[str, Any]:
+        """Normalize legacy or wrapped LLM JSON payloads to match BreatheSmartActionPlanResponse."""
+        if "response" in parsed_json and isinstance(parsed_json["response"], dict):
+            parsed_json = parsed_json["response"]
+
+        if "recommendations" in parsed_json or not any(
+            k in parsed_json for k in ("personal_exposure", "direct_emissions")
+        ):
+            return parsed_json
+
+        group_defaults: tuple[tuple[str, dict[str, str]], ...] = (
+            (
+                "personal_exposure",
+                {
+                    "category": "outdoor",
+                    "impact_type": "exposure",
+                    "priority": "high",
+                    "confidence": "high",
+                    "recommended_time": "All Day",
+                    "reason": "Particulate exposure avoidance",
+                    "expected_impact": "Reduces inhalation of fine particulates",
+                },
+            ),
+            (
+                "direct_emissions",
+                {
+                    "category": "sustainability",
+                    "impact_type": "emissions",
+                    "priority": "medium",
+                    "confidence": "high",
+                    "recommended_time": "Daily",
+                    "reason": "Carbon footprint reduction",
+                    "expected_impact": "Measurable CO2e reduction",
+                },
+            ),
+        )
+
+        recs: list[dict[str, Any]] = []
+        for group_key, defaults in group_defaults:
+            for item in parsed_json.get(group_key, []):
+                if isinstance(item, dict):
+                    for field, default_val in defaults.items():
+                        item.setdefault(field, default_val)
+                    recs.append(item)
+
+        parsed_json["recommendations"] = recs
+        parsed_json.setdefault("summary", f"Daily air quality plan for AQI {aqi_data.aqi}")
+        parsed_json.setdefault(
+            "explanation",
+            f"Current air quality is {aqi_data.aqi_category.value} with dominant pollutant {aqi_data.dominant_pollutant}.",
+        )
+        parsed_json.setdefault("risk_level", cls._derive_risk_level(aqi_data.aqi))
+        return parsed_json
+
     async def generate_action_plan(
         self,
         aqi_data: NormalizedAirQuality,
@@ -41,35 +140,7 @@ class GroqAIService:
                 aqi_data, user_preferences
             )
 
-        user_content = json.dumps(
-            {
-                "environmental_context": {
-                    "aqi": aqi_data.aqi,
-                    "standard": aqi_data.aqi_standard.value,
-                    "category": aqi_data.aqi_category.value,
-                    "pollutants": {
-                        "pm2_5": aqi_data.pollutants.pm2_5.value
-                        if aqi_data.pollutants.pm2_5
-                        else None,
-                        "pm10": aqi_data.pollutants.pm10.value
-                        if aqi_data.pollutants.pm10
-                        else None,
-                        "no2": aqi_data.pollutants.no2.value
-                        if aqi_data.pollutants.no2
-                        else None,
-                        "o3": aqi_data.pollutants.o3.value
-                        if aqi_data.pollutants.o3
-                        else None,
-                    },
-                    "coordinates": {
-                        "lat": aqi_data.latitude,
-                        "lon": aqi_data.longitude,
-                    },
-                    "observed_at": str(aqi_data.source_metadata.observed_at),
-                },
-                "user_preferences": user_preferences or {},
-            }
-        )
+        user_content = self._build_action_plan_context(aqi_data, user_preferences)
 
         for attempt in range(settings.AI_MAX_RETRIES + 1):
             try:
@@ -87,62 +158,9 @@ class GroqAIService:
                     temperature=0.2,
                 )
                 raw_response = chat_completion.choices[0].message.content or "{}"
-                parsed_json = json.loads(raw_response)
-                # Handle wrapped "response" key if present
-                if "response" in parsed_json and isinstance(
-                    parsed_json["response"], dict
-                ):
-                    parsed_json = parsed_json["response"]
-
-                # Normalize if model used grouped exposure/emissions keys
-                if "recommendations" not in parsed_json and any(
-                    k in parsed_json for k in ["personal_exposure", "direct_emissions"]
-                ):
-                    recs = []
-                    for item in parsed_json.get("personal_exposure", []):
-                        if isinstance(item, dict):
-                            item.setdefault("category", "outdoor")
-                            item.setdefault("impact_type", "exposure")
-                            item.setdefault("priority", "high")
-                            item.setdefault("confidence", "high")
-                            item.setdefault("recommended_time", "All Day")
-                            item.setdefault("reason", "Particulate exposure avoidance")
-                            item.setdefault(
-                                "expected_impact",
-                                "Reduces inhalation of fine particulates",
-                            )
-                            recs.append(item)
-                    for item in parsed_json.get("direct_emissions", []):
-                        if isinstance(item, dict):
-                            item.setdefault("category", "sustainability")
-                            item.setdefault("impact_type", "emissions")
-                            item.setdefault("priority", "medium")
-                            item.setdefault("confidence", "high")
-                            item.setdefault("recommended_time", "Daily")
-                            item.setdefault("reason", "Carbon footprint reduction")
-                            item.setdefault(
-                                "expected_impact", "Measurable CO2e reduction"
-                            )
-                            recs.append(item)
-                    parsed_json["recommendations"] = recs
-                    parsed_json.setdefault(
-                        "summary", f"Daily air quality plan for AQI {aqi_data.aqi}"
-                    )
-                    parsed_json.setdefault(
-                        "explanation",
-                        f"Current air quality is {aqi_data.aqi_category.value} with dominant pollutant {aqi_data.dominant_pollutant}.",
-                    )
-                    parsed_json.setdefault(
-                        "risk_level",
-                        "severe"
-                        if aqi_data.aqi >= 200
-                        else (
-                            "high"
-                            if aqi_data.aqi >= 150
-                            else ("moderate" if aqi_data.aqi >= 50 else "good")
-                        ),
-                    )
-
+                parsed_json = self._normalize_action_plan_payload(
+                    json.loads(raw_response), aqi_data
+                )
                 return BreatheSmartActionPlanResponse.model_validate(parsed_json)
             except Exception as exc:
                 logger.warning(

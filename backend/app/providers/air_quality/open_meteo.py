@@ -24,6 +24,7 @@ from app.schemas.air_quality import (
 
 
 def calculate_us_aqi_category(aqi_val: int) -> AQICategory:
+    """Classify a numeric US AQI reading into its EPA category."""
     if aqi_val <= 50:
         return AQICategory.GOOD
     elif aqi_val <= 100:
@@ -38,6 +39,8 @@ def calculate_us_aqi_category(aqi_val: int) -> AQICategory:
 
 
 class OpenMeteoAirQualityProvider(BaseAirQualityProvider):
+    """Open-Meteo CAMS atmospheric provider with TTL caching and exponential backoff."""
+
     BASE_URL = "https://air-quality-api.open-meteo.com/v1/air-quality"
     CACHE_TTL_SECONDS = 900  # 15 minutes
 
@@ -46,13 +49,16 @@ class OpenMeteoAirQualityProvider(BaseAirQualityProvider):
         self._cache: dict[str, tuple[float, Any]] = {}
 
     async def aclose(self) -> None:
+        """Close the underlying HTTPX async client if still open."""
         if not self._client.is_closed:
             await self._client.aclose()
 
     def _cache_key(self, prefix: str, lat: float, lon: float) -> str:
+        """Build a coordinate-rounded cache key for TTL lookup."""
         return f"{prefix}:{round(lat, 3)}:{round(lon, 3)}"
 
     async def _fetch_with_retry(self, params: dict[str, Any]) -> dict[str, Any]:
+        """Execute GET request with exponential backoff and jitter on transient errors."""
         max_retries = 3
         backoff = 0.5
         for attempt in range(max_retries):
