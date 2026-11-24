@@ -51,19 +51,23 @@ class UserSession(Base):
         back_populates="session",
         uselist=False,
         cascade="all, delete-orphan",
+        lazy="selectin",
     )
     locations: Mapped[list["SavedLocation"]] = relationship(
         "SavedLocation",
         back_populates="session",
         cascade="all, delete-orphan",
+        lazy="selectin",
     )
     recommendations: Mapped[list["RecommendationPlan"]] = relationship(
         "RecommendationPlan",
         back_populates="session",
         cascade="all, delete-orphan",
+        lazy="selectin",
     )
     feedbacks: Mapped[list["UserFeedback"]] = relationship(
         "UserFeedback",
         back_populates="session",
         cascade="all, delete-orphan",
+        lazy="selectin",
     )
