@@ -1,14 +1,11 @@
 """Dependencies for session authentication, database sessions, and CSRF protection."""
 
-from datetime import datetime, timedelta, timezone
-from typing import Annotated
 import uuid
-from fastapi import Cookie, Depends, Header, HTTPException, Request, Response, status
-from sqlalchemy import select
-from sqlalchemy.orm import selectinload
-from sqlalchemy.ext.asyncio import AsyncSession
+from datetime import UTC, datetime, timedelta
+from typing import Annotated
+
 from app.core.config import settings
-from app.core.exceptions import CSRFError, InvalidSessionError
+from app.core.exceptions import CSRFError
 from app.core.security import (
     generate_csrf_token,
     generate_session_token,
@@ -19,6 +16,10 @@ from app.core.security import (
 from app.db.session import get_db
 from app.models.profile import UserProfile
 from app.models.session import UserSession
+from fastapi import Cookie, Depends, Header, Request, Response
+from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import selectinload
 
 
 async def get_or_create_session(
@@ -33,7 +34,7 @@ async def get_or_create_session(
     if not raw_token and authorization and authorization.startswith("Bearer "):
         raw_token = authorization.split(" ")[1]
 
-    now = datetime.now(timezone.utc)
+    now = datetime.now(UTC)
 
     if raw_token:
         token_h = hash_token(raw_token)

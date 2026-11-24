@@ -1,13 +1,15 @@
 """Integration tests for versioned REST API endpoints."""
 
 import pytest
-from httpx import ASGITransport, AsyncClient
 from app.main import app
+from httpx import ASGITransport, AsyncClient
 
 
 @pytest.mark.asyncio
 async def test_health_endpoints():
-    async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as ac:
+    async with AsyncClient(
+        transport=ASGITransport(app=app), base_url="http://test"
+    ) as ac:
         resp = await ac.get("/health")
         assert resp.status_code == 200
         assert resp.json()["status"] == "ok"
@@ -15,7 +17,9 @@ async def test_health_endpoints():
 
 @pytest.mark.asyncio
 async def test_locations_search_endpoint():
-    async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as ac:
+    async with AsyncClient(
+        transport=ASGITransport(app=app), base_url="http://test"
+    ) as ac:
         resp = await ac.get("/api/v1/locations/search?q=London")
         assert resp.status_code == 200
         data = resp.json()
@@ -27,8 +31,12 @@ async def test_locations_search_endpoint():
 
 @pytest.mark.asyncio
 async def test_air_quality_current_endpoint():
-    async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as ac:
-        resp = await ac.get("/api/v1/air-quality/current?latitude=28.6139&longitude=77.2090")
+    async with AsyncClient(
+        transport=ASGITransport(app=app), base_url="http://test"
+    ) as ac:
+        resp = await ac.get(
+            "/api/v1/air-quality/current?latitude=28.6139&longitude=77.2090"
+        )
         assert resp.status_code == 200
         data = resp.json()
         assert "aqi" in data
@@ -38,8 +46,12 @@ async def test_air_quality_current_endpoint():
 
 @pytest.mark.asyncio
 async def test_recommendations_indoor_endpoint():
-    async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as ac:
-        resp = await ac.get("/api/v1/recommendations/indoor?latitude=28.6139&longitude=77.2090")
+    async with AsyncClient(
+        transport=ASGITransport(app=app), base_url="http://test"
+    ) as ac:
+        resp = await ac.get(
+            "/api/v1/recommendations/indoor?latitude=28.6139&longitude=77.2090"
+        )
         assert resp.status_code == 200
         data = resp.json()
         assert "ventilation" in data
@@ -49,7 +61,9 @@ async def test_recommendations_indoor_endpoint():
 
 @pytest.mark.asyncio
 async def test_sustainability_compare_endpoint():
-    async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as ac:
+    async with AsyncClient(
+        transport=ASGITransport(app=app), base_url="http://test"
+    ) as ac:
         payload = {
             "baseline_mode": "petrol_car",
             "alternative_mode": "metro_train",
@@ -65,7 +79,9 @@ async def test_sustainability_compare_endpoint():
 
 @pytest.mark.asyncio
 async def test_assistant_chat_endpoint():
-    async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as ac:
+    async with AsyncClient(
+        transport=ASGITransport(app=app), base_url="http://test"
+    ) as ac:
         payload = {
             "message": "What is the recommended ventilation time for today?",
             "history": [],

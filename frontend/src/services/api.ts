@@ -1,9 +1,12 @@
 import type {
+  AIChatResponse,
   AirQualityForecast,
   BreatheSmartActionPlanResponse,
   CommuteShiftImpact,
+  IndoorAirAdvisorReport,
   LocationSearchResult,
   NormalizedAirQuality,
+  UserProfile,
 } from '../types';
 
 function getCookie(name: string): string | null {
@@ -66,7 +69,7 @@ export const api = {
     }),
 
   getIndoorAdvisor: (lat: number, lon: number, hasPurifier = true) =>
-    request<any>(`/api/v1/recommendations/indoor?latitude=${lat}&longitude=${lon}&has_purifier=${hasPurifier}`),
+    request<IndoorAirAdvisorReport>(`/api/v1/recommendations/indoor?latitude=${lat}&longitude=${lon}&has_purifier=${hasPurifier}`),
 
   // Sustainability
   compareCommute: (data: {
@@ -81,25 +84,30 @@ export const api = {
     }),
 
   // AI Assistant Chat
-  chatWithAssistant: (message: string, lat?: number, lon?: number, history: any[] = []) => {
+  chatWithAssistant: (
+    message: string,
+    lat?: number,
+    lon?: number,
+    history: Array<{ role: string; content: string }> = []
+  ) => {
     const query = lat && lon ? `?latitude=${lat}&longitude=${lon}` : '';
-    return request<any>(`/api/v1/assistant/chat${query}`, {
+    return request<AIChatResponse>(`/api/v1/assistant/chat${query}`, {
       method: 'POST',
       body: JSON.stringify({ message, history }),
     });
   },
 
   // Profile
-  getProfile: () => request<any>('/api/v1/profile'),
-  updateProfile: (profileData: any) =>
-    request<any>('/api/v1/profile', {
+  getProfile: () => request<UserProfile>('/api/v1/profile'),
+  updateProfile: (profileData: Partial<UserProfile>) =>
+    request<UserProfile>('/api/v1/profile', {
       method: 'PUT',
       body: JSON.stringify(profileData),
     }),
 
   // Feedback
   submitFeedback: (recommendationId: string, rating: number, feedback?: string) =>
-    request<any>('/api/v1/feedback', {
+    request<{ id: string; rating: number }>('/api/v1/feedback', {
       method: 'POST',
       body: JSON.stringify({
         recommendation_id: recommendationId,

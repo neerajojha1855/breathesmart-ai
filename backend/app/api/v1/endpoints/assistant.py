@@ -1,7 +1,7 @@
-from fastapi import APIRouter, Query
 from app.ai.groq_client import GroqAIService
 from app.ai.schemas import AIChatRequest, AIChatResponse
 from app.providers.air_quality.open_meteo import OpenMeteoAirQualityProvider
+from fastapi import APIRouter, Query
 
 router = APIRouter(prefix="/assistant", tags=["AI Assistant"])
 ai_service = GroqAIService()

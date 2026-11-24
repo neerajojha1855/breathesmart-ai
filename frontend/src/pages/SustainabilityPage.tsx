@@ -188,7 +188,7 @@ export const SustainabilityPage: React.FC = () => {
                   <strong className="text-slate-600">Methodology & Assumptions: </strong>
                   {impactResult.methodology}
                   <ul className="list-disc list-inside mt-1 space-y-0.5">
-                    {impactResult.assumptions.map((a, i) => (
+                    {impactResult.assumptions?.map((a, i) => (
                       <li key={i}>{a}</li>
                     ))}
                   </ul>

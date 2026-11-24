@@ -1,9 +1,9 @@
 """Indoor Air Quality Service: Scientifically safe ventilation schedules, HEPA purification, and combustion hazard mitigation."""
 
 from enum import Enum
-from typing import Any
-from pydantic import BaseModel, Field
+
 from app.schemas.air_quality import AirQualityForecast, NormalizedAirQuality
+from pydantic import BaseModel, Field
 
 
 class VentilationSuitability(str, Enum):
@@ -16,7 +16,9 @@ class VentilationSuitability(str, Enum):
 class VentilationRecommendation(BaseModel):
     suitability: VentilationSuitability
     can_open_windows: bool
-    recommended_window: str = Field(description="Optimal time range e.g. '01:00 PM - 02:30 PM'")
+    recommended_window: str = Field(
+        description="Optimal time range e.g. '01:00 PM - 02:30 PM'"
+    )
     max_duration_minutes: int
     rationale: str
     co2_management_warning: str
@@ -119,8 +121,6 @@ class IndoorAirService:
         room_area_sqm: float = 25.0,
     ) -> PurifierRecommendation:
         aqi = aqi_data.aqi
-        # Assume 2.5m ceiling height
-        room_volume_m3 = room_area_sqm * 2.5
 
         if aqi > 200:
             mode = "High / Turbo Mode (Continuous)"

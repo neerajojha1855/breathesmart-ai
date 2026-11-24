@@ -2,12 +2,16 @@
 
 import logging
 from typing import Any
+
 from app.ai.groq_client import GroqAIService
 from app.ai.schemas import BreatheSmartActionPlanResponse
 from app.providers.air_quality.open_meteo import OpenMeteoAirQualityProvider
-from app.schemas.air_quality import AirQualityForecast, NormalizedAirQuality
 from app.services.indoor_air_service import IndoorAirAdvisorReport, IndoorAirService
-from app.services.sustainability_service import CommuteShiftImpact, SustainabilityService, TransportMode
+from app.services.sustainability_service import (
+    CommuteShiftImpact,
+    SustainabilityService,
+    TransportMode,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -45,8 +49,12 @@ class RecommendationService:
     ) -> IndoorAirAdvisorReport:
         """Generate scientific indoor air quality guidance balancing ventilation and filtration."""
         aqi_data = await self.aq_provider.get_current_air_quality(latitude, longitude)
-        forecast = await self.aq_provider.get_forecast(latitude, longitude, forecast_days=2)
-        return IndoorAirService.generate_full_advisor_report(aqi_data, has_purifier=has_purifier, forecast=forecast)
+        forecast = await self.aq_provider.get_forecast(
+            latitude, longitude, forecast_days=2
+        )
+        return IndoorAirService.generate_full_advisor_report(
+            aqi_data, has_purifier=has_purifier, forecast=forecast
+        )
 
     def calculate_sustainability_impact(
         self,

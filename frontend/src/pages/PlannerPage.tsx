@@ -121,10 +121,10 @@ export const PlannerPage: React.FC = () => {
                         {rec.expected_impact}
                       </div>
 
-                      {rec.assumptions.length > 0 && (
+                      {Boolean(rec.assumptions?.length) && (
                         <div className="text-[11px] text-slate-400">
                           <strong>Note: </strong>
-                          {rec.assumptions.join(' ')}
+                          {rec.assumptions?.join(' ')}
                         </div>
                       )}
                     </div>
@@ -163,7 +163,7 @@ export const PlannerPage: React.FC = () => {
           </div>
 
           {/* Safety & Limitations Disclaimers */}
-          {plan.safety_notes.length > 0 && (
+          {Boolean(plan.safety_notes?.length) && (
             <div className="bg-slate-100 rounded-xl p-4 text-xs text-slate-600 flex items-start gap-2.5">
               <ShieldAlert className="w-4 h-4 text-slate-500 shrink-0 mt-0.5" />
               <div>

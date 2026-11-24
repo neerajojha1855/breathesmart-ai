@@ -1,7 +1,10 @@
 """Unit tests verifying AQI normalization, schema parsing, and caching."""
 
 import pytest
-from app.providers.air_quality.open_meteo import OpenMeteoAirQualityProvider, calculate_us_aqi_category
+from app.providers.air_quality.open_meteo import (
+    OpenMeteoAirQualityProvider,
+    calculate_us_aqi_category,
+)
 from app.schemas.air_quality import AQICategory, AQIStandard, DataSourceType
 
 

@@ -2,6 +2,7 @@
 
 from enum import Enum
 from typing import Any
+
 from pydantic import BaseModel, Field
 
 
@@ -44,22 +45,34 @@ class ActionRecommendationItem(BaseModel):
     title: str = Field(description="Short, action-oriented title")
     category: RecommendationCategory
     priority: RecommendationPriority
-    recommended_time: str = Field(description="Time window e.g., '06:00 - 08:00 AM' or 'Evening'")
+    recommended_time: str = Field(
+        description="Time window e.g., '06:00 - 08:00 AM' or 'Evening'"
+    )
     action: str = Field(description="Specific, practical step to carry out")
     reason: str = Field(description="Underlying atmospheric or behavioral rationale")
     expected_impact: str = Field(description="Expected benefit description")
     impact_type: ImpactType
     confidence: ConfidenceLevel
-    assumptions: list[str] = Field(default_factory=list, description="Explicit assumptions or limitations")
+    assumptions: list[str] = Field(
+        default_factory=list, description="Explicit assumptions or limitations"
+    )
 
 
 class BreatheSmartActionPlanResponse(BaseModel):
-    summary: str = Field(description="Executive summary of today's environmental situation")
+    summary: str = Field(
+        description="Executive summary of today's environmental situation"
+    )
     risk_level: RiskLevel
-    explanation: str = Field(description="Accessible explanation of primary pollutants without medical advice")
+    explanation: str = Field(
+        description="Accessible explanation of primary pollutants without medical advice"
+    )
     recommendations: list[ActionRecommendationItem]
-    limitations: list[str] = Field(default_factory=list, description="Data boundaries or modeling assumptions")
-    safety_notes: list[str] = Field(default_factory=list, description="General health precautions")
+    limitations: list[str] = Field(
+        default_factory=list, description="Data boundaries or modeling assumptions"
+    )
+    safety_notes: list[str] = Field(
+        default_factory=list, description="General health precautions"
+    )
 
 
 class AIChatMessage(BaseModel):

@@ -1,14 +1,15 @@
-from typing import Annotated
 import uuid
-from fastapi import APIRouter, Depends, HTTPException, Query, status
-from sqlalchemy import delete, select
-from sqlalchemy.ext.asyncio import AsyncSession
+from typing import Annotated
+
 from app.api.deps import get_db, get_or_create_session
 from app.models.location import SavedLocation
 from app.models.session import UserSession
 from app.providers.geocoding.open_meteo import OpenMeteoGeocodingProvider
 from app.schemas.geocoding import LocationSearchResult
 from app.schemas.location import LocationCreate, SavedLocationResponse
+from fastapi import APIRouter, Depends, HTTPException, Query, status
+from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
 
 router = APIRouter(prefix="/locations", tags=["Locations"])
 geocoding_provider = OpenMeteoGeocodingProvider()
@@ -20,7 +21,9 @@ async def search_cities(q: str = Query(min_length=2, max_length=100)):
     return await geocoding_provider.search_locations(q)
 
 
-@router.post("", response_model=SavedLocationResponse, status_code=status.HTTP_201_CREATED)
+@router.post(
+    "", response_model=SavedLocationResponse, status_code=status.HTTP_201_CREATED
+)
 async def save_location(
     loc_in: LocationCreate,
     session: Annotated[UserSession, Depends(get_or_create_session)],
@@ -61,11 +64,12 @@ async def delete_saved_location(
     db: Annotated[AsyncSession, Depends(get_db)],
 ):
     """Remove a saved location."""
-    stmt = delete(SavedLocation).where(
-        SavedLocation.id == location_id,
-        SavedLocation.session_id == session.id,
+    loc = await db.scalar(
+        select(SavedLocation).where(
+            SavedLocation.id == location_id, SavedLocation.session_id == session.id
+        )
     )
-    result = await db.execute(stmt)
-    if result.rowcount == 0:
+    if not loc:
         raise HTTPException(status_code=404, detail="Location not found")
+    await db.delete(loc)
     await db.commit()

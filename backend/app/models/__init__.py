@@ -9,11 +9,11 @@ from app.models.recommendation import RecommendationPlan
 from app.models.session import UserSession
 
 __all__ = [
-    "Base",
-    "UserSession",
-    "UserProfile",
-    "SavedLocation",
     "AirQualitySnapshot",
+    "Base",
     "RecommendationPlan",
+    "SavedLocation",
     "UserFeedback",
+    "UserProfile",
+    "UserSession",
 ]

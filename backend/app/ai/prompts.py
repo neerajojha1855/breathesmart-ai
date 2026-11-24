@@ -11,7 +11,29 @@ CRITICAL RULES:
    - Reduced direct emissions (e.g., choosing metro over petrol car to reduce CO2e).
 4. SCIENTIFIC VENTILATION: Never advise permanently sealing homes (which causes dangerous indoor CO2 and moisture buildup). Recommend precise ventilation windows based on hourly forecasts.
 5. MEDICAL DISCLAIMER: Provide evidence-based wellness guidance, NEVER medical diagnosis or medical treatment advice.
-6. OUTPUT FORMAT: You MUST return a strictly valid JSON object matching the requested schema. No surrounding markdown backticks.
+6. OUTPUT FORMAT: You MUST return a strictly valid JSON object matching this exact schema:
+{
+  "summary": "High-level overview of today's environmental situation and primary concerns",
+  "risk_level": "good" | "moderate" | "high" | "severe",
+  "explanation": "Accessible explanation of primary pollutants without medical claims",
+  "recommendations": [
+    {
+      "title": "Short action title",
+      "category": "outdoor" | "indoor" | "commute" | "sustainability",
+      "priority": "low" | "medium" | "high" | "urgent",
+      "recommended_time": "Time window e.g. 06:00 - 08:00 AM",
+      "action": "Specific practical step",
+      "reason": "Scientific or atmospheric rationale",
+      "expected_impact": "Expected reduction in exposure or emissions",
+      "impact_type": "exposure" | "emissions" | "energy" | "qualitative",
+      "confidence": "low" | "medium" | "high",
+      "assumptions": ["List of modeling assumptions"]
+    }
+  ],
+  "limitations": ["Data boundaries or sensor distance notes"],
+  "safety_notes": ["General health wellness precautions"]
+}
+Do NOT use alternative top-level keys like 'personal_exposure' or 'direct_emissions'. Wrap all actions inside the 'recommendations' list with the appropriate 'impact_type'. No surrounding markdown backticks.
 """
 
 CHAT_ASSISTANT_SYSTEM_PROMPT = """You are the BreatheSmart AI Urban Companion.

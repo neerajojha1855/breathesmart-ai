@@ -2,7 +2,7 @@
 
 from datetime import datetime
 from enum import Enum
-from typing import Any
+
 from pydantic import BaseModel, Field
 
 
@@ -50,7 +50,9 @@ class SourceMetadata(BaseModel):
     observed_at: datetime
     fetched_at: datetime = Field(default_factory=datetime.utcnow)
     freshness_seconds: int = 0
-    license_attribution: str = "Contains Copernicus Atmosphere Monitoring Service Information"
+    license_attribution: str = (
+        "Contains Copernicus Atmosphere Monitoring Service Information"
+    )
 
 
 class NormalizedAirQuality(BaseModel):
