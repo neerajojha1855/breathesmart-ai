@@ -8,7 +8,7 @@
     --color-primary: #059669;
     --color-accent: #0284c7;
     --color-text-main: #0f172a;
-    --color-text-muted: #64748b;
+    --color-text-muted: #475569; /* Enhanced contrast >= 4.5:1 */
   }
 
   body {
@@ -20,13 +20,26 @@
     -moz-osx-font-smoothing: grayscale;
   }
 
-  /* Accessible focus indicators */
+  /* Accessible focus indicators conforming to WCAG 2.1 AA */
   :focus-visible {
     outline: 2px solid #059669;
     outline-offset: 2px;
   }
 }
 
+/* Reduced-motion support for vestibular disorders */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  ::before,
+  ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Skip link for keyboard navigation */
 .skip-to-content {
   position: absolute;
   top: -100px;
@@ -42,4 +55,17 @@
 
 .skip-to-content:focus {
   top: 1rem;
+}
+
+/* Screen-reader utility */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
 }
